@@ -11,6 +11,7 @@ class AccurateClient
     protected $token;
     protected $signature;
     protected $timeStamp;
+    // 
 
     public function __construct($token, $signature)
     {

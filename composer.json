@@ -1,0 +1,25 @@
+{
+    "name": "horizondoxa/accurate-buddy",
+    "description": "Library for connection to Accurate Online",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Horizondoxa\\AccurateBuddy\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Al Ghifari Anwar",
+            "email": "alghifari.anwar2002@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=7.4",
+        "guzzlehttp/guzzle": "^7.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0"
+    }
+}

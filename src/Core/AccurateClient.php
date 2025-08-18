@@ -18,7 +18,6 @@ class AccurateClient
         date_default_timezone_set('Asia/Jakarta');
         $this->client = new Client([
             'verify' => false,
-            'debug' => true,
         ]);
         $this->baseUrl = $baseUrl;
         $this->token = $token;

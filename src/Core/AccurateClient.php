@@ -13,13 +13,14 @@ class AccurateClient
     protected $timeStamp;
     // 
 
-    public function __construct($token, $signature)
+    public function __construct($token, $signature, $baseUrl = null)
     {
         date_default_timezone_set('Asia/Jakarta');
         $this->client = new Client([
-            'verify' => false
+            'verify' => false,
+            'debug' => true,
         ]);
-        $this->baseUrl = "https://zeus.accurate.id/accurate/api/";
+        $this->baseUrl = $baseUrl;
         $this->token = $token;
         $this->timeStamp = date("d/m/Y H:i:s");
         $this->signature = base64_encode(hash_hmac('sha256', $this->timeStamp, $signature, true));

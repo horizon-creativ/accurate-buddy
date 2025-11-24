@@ -23,7 +23,7 @@ class FinishedGoodSlip
      */
     public function getList($params)
     {
-        return $this->client->request('GET', $this->module . '/list.do', ['query' => $params]);
+        return $this->safeRequest('GET', $this->module . '/list.do', ['query' => $params]);
     }
 
     /**
@@ -34,7 +34,7 @@ class FinishedGoodSlip
      */
     public function getDetail($id)
     {
-        return $this->client->request('GET', $this->module . '/detail.do', ['query' => ['id' => $id]]);
+        return $this->safeRequest('GET', $this->module . '/detail.do', ['query' => ['id' => $id]]);
     }
 
     /**
@@ -45,7 +45,7 @@ class FinishedGoodSlip
      */
     public function create(array $data)
     {
-        return $this->client->request('POST', $this->module . '/save.do', ['json' => $data]);
+        return $this->safeRequest('POST', $this->module . '/save.do', ['json' => $data]);
     }
 
     /**
@@ -58,7 +58,7 @@ class FinishedGoodSlip
     public function update($id, array $data)
     {
         $data['id'] = $id;
-        return $this->client->request('POST', $this->module . '/save.do', ['json' => $data]);
+        return $this->safeRequest('POST', $this->module . '/save.do', ['json' => $data]);
     }
 
     /**
@@ -69,6 +69,41 @@ class FinishedGoodSlip
      */
     public function delete($id)
     {
-        return $this->client->request('POST', $this->module . '/delete.do', ['json' => ['id' => $id]]);
+        return $this->safeRequest('POST', $this->module . '/delete.do', ['json' => ['id' => $id]]);
+    }
+
+    private function safeRequest($method, $endpoint, $options = [])
+    {
+        try {
+            return $this->client->request($method, $endpoint, $options);
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            return $this->formatException($e);
+        } catch (\GuzzleHttp\Exception\ServerException $e) {
+            return $this->formatException($e);
+        } catch (\GuzzleHttp\Exception\RequestException $e) {
+            return $this->formatException($e);
+        } catch (\Throwable $e) {
+            // LAST DEFENSE – menangkap semua error fatal
+            return [
+                's' => false,
+                'd'   => [$e->getMessage()],
+            ];
+        }
+    }
+
+    private function formatException($e)
+    {
+        $status = $e->hasResponse()
+            ? $e->getResponse()->getStatusCode()
+            : null;
+
+        $body = $e->hasResponse()
+            ? json_decode($e->getResponse()->getBody()->getContents(), true)
+            : null;
+
+        return [
+            's' => false,
+            'd'   => [$e],
+        ];
     }
 }

@@ -23,7 +23,7 @@ class Item
      */
     public function getList($params)
     {
-        return $this->client->request('GET', $this->module . '/list.do', ['query' => $params]);
+        return $this->safeRequest('GET', $this->module . '/list.do', ['query' => $params]);
     }
 
     /**
@@ -34,7 +34,7 @@ class Item
      */
     public function getDetail($id)
     {
-        return $this->client->request('GET', $this->module . '/detail.do', ['query' => ['id' => $id]]);
+        return $this->safeRequest('GET', $this->module . '/detail.do', ['query' => ['id' => $id]]);
     }
 
     /**
@@ -45,7 +45,7 @@ class Item
      */
     public function create(array $data)
     {
-        return $this->client->request('POST', $this->module . '/save.do', ['json' => $data]);
+        return $this->safeRequest('POST', $this->module . '/save.do', ['json' => $data]);
     }
 
     /**
@@ -58,7 +58,7 @@ class Item
     public function update($id, array $data)
     {
         $data['id'] = $id;
-        return $this->client->request('POST', $this->module . '/save.do', ['json' => $data]);
+        return $this->safeRequest('POST', $this->module . '/save.do', ['json' => $data]);
     }
 
     /**
@@ -69,7 +69,7 @@ class Item
      */
     public function delete($id)
     {
-        return $this->client->request('POST', $this->module . '/delete.do', ['json' => ['id' => $id]]);
+        return $this->safeRequest('POST', $this->module . '/delete.do', ['json' => ['id' => $id]]);
     }
 
     /**
@@ -80,7 +80,7 @@ class Item
      */
     public function getNearestCost($params)
     {
-        return $this->client->request('GET', $this->module . '/get-nearest-cost.do', ['query' => $params]);
+        return $this->safeRequest('GET', $this->module . '/get-nearest-cost.do', ['query' => $params]);
     }
 
     /**
@@ -91,7 +91,7 @@ class Item
      */
     public function getSellingPrice($params)
     {
-        return $this->client->request('GET', $this->module . '/get-selling-price.do', ['query' => $params]);
+        return $this->safeRequest('GET', $this->module . '/get-selling-price.do', ['query' => $params]);
     }
 
     /**
@@ -102,7 +102,7 @@ class Item
      */
     public function getStock($params)
     {
-        return $this->client->request('GET', $this->module . '/get-stock.do', ['query' => $params]);
+        return $this->safeRequest('GET', $this->module . '/get-stock.do', ['query' => $params]);
     }
 
     /**
@@ -113,7 +113,7 @@ class Item
      */
     public function getListStock($params)
     {
-        return $this->client->request('GET', $this->module . '/list-stock.do', ['query' => $params]);
+        return $this->safeRequest('GET', $this->module . '/list-stock.do', ['query' => $params]);
     }
 
     /**
@@ -124,7 +124,7 @@ class Item
      */
     public function searchByItemOrSn($params)
     {
-        return $this->client->request('GET', $this->module . '/search-by-item-or-sn.do', ['query' => $params]);
+        return $this->safeRequest('GET', $this->module . '/search-by-item-or-sn.do', ['query' => $params]);
     }
 
     /**
@@ -135,7 +135,7 @@ class Item
      */
     public function searchByUpcNumber($params)
     {
-        return $this->client->request('GET', $this->module . '/search-by-no-upc.do', ['query' => $params]);
+        return $this->safeRequest('GET', $this->module . '/search-by-no-upc.do', ['query' => $params]);
     }
 
     /**
@@ -146,7 +146,7 @@ class Item
      */
     public function getStockMutationHistory($params)
     {
-        return $this->client->request('GET', $this->module . '/stock-mutation-history.do', ['query' => $params]);
+        return $this->safeRequest('GET', $this->module . '/stock-mutation-history.do', ['query' => $params]);
     }
 
     /**
@@ -157,6 +157,41 @@ class Item
      */
     public function getLastVendorPrice($params)
     {
-        return $this->client->request('GET', $this->module . '/vendor-price.do', ['query' => $params]);
+        return $this->safeRequest('GET', $this->module . '/vendor-price.do', ['query' => $params]);
+    }
+
+    private function safeRequest($method, $endpoint, $options = [])
+    {
+        try {
+            return $this->client->request($method, $endpoint, $options);
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            return $this->formatException($e);
+        } catch (\GuzzleHttp\Exception\ServerException $e) {
+            return $this->formatException($e);
+        } catch (\GuzzleHttp\Exception\RequestException $e) {
+            return $this->formatException($e);
+        } catch (\Throwable $e) {
+            // LAST DEFENSE – menangkap semua error fatal
+            return [
+                's' => false,
+                'd'   => [$e->getMessage()],
+            ];
+        }
+    }
+
+    private function formatException($e)
+    {
+        $status = $e->hasResponse()
+            ? $e->getResponse()->getStatusCode()
+            : null;
+
+        $body = $e->hasResponse()
+            ? json_decode($e->getResponse()->getBody()->getContents(), true)
+            : null;
+
+        return [
+            's' => false,
+            'd'   => [$e],
+        ];
     }
 }

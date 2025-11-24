@@ -11,15 +11,15 @@ $token = 'aat.MTUw.eyJ2IjoxLCJ1Ijo5NzYzNjgsImQiOjIwMDU1NTksImFpIjo1ODE3NCwiYWsiO
 // $token = '';
 $signature = 'HjKaOjRu0ZWIeArefDQHVJnzEIeJUxdi1TceMobyUNh9FwQ7iHYGzOM1C9qtzjxJ';
 
-$client = new AccurateClient($token, $signature, 'https://iris.accurate.id/accurate/api/');
+$client = new AccurateClient($token, $signature, 'https://iri.accurate.id/accurate/api/');
 $item = new Item($client);
 $params = [
     'fields' => 'id,name,no'
 ];
 // GET LIST
-$list = $item->getList($params);
-print_r($list);
+// $list = $item->getList($params);
+// print_r($list);
 
 // GET DETAIL
-// $detail = $item->getDetail(2551);
-// print_r($detail);
+$detail = $item->getDetail(2551);
+print_r($detail);
